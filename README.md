@@ -7,6 +7,8 @@ pandoc-japanese-filters - some description
 ## What is this?
 Japanese-specific markup filters for pandoc.
 
+Read [Spec](https://github.com/konn/pandoc-japanese-filters/blob/master/Spec.md) for more detail of representation of Japanse markup in Pandoc.
+
 ## Install
 
 ```sh
