@@ -2,10 +2,10 @@ pandoc-japanese-filters - some description
 ================================
 
 [![Build Status](https://travis-ci.org/konn/pandoc-japanese-filters.svg?branch=master)](https://travis-ci.org/konn/pandoc-japanese-filters) 
-[![loop-effin](http://img.shields.io/hackage/v/pandoc-japanese-filters.svg)](http://hackage.haskell.org/package/pandoc-japanese-filters)
+[![pandoc-japanese-filters](http://img.shields.io/hackage/v/pandoc-japanese-filters.svg)](http://hackage.haskell.org/package/pandoc-japanese-filters)
 
 ## What is this?
-This is my great application.
+Japanese-specific markup filters for pandoc.
 
 ## Install
 
@@ -14,10 +14,6 @@ $ cabal install pandoc-japanese-filters
 ```
 
 ## Usage
-
-```sh
-$ pandoc-japanese-filters foo bar
-```
 
 ## Licence
 
