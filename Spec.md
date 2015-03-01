@@ -1,7 +1,7 @@
 Pandoc representation of Japanese markups
 =========================================
 
-We express Japanese-specific markups with `Span`{.haskell} constructor.
+We express Japanese-specific markups with `Span` constructor.
 Currently we support following markups:
 
 * Ruby (振り仮名; Furigana),
@@ -17,12 +17,12 @@ Span ("", ["ruby"], attrs) ["ほっかいどう", "北海道"]
 ```
 
 We store additional format specific attribute information
-in `attrs`{.haskell}.
+in `attrs`.
 
 Tatechuyoko
 -----------
 Tatechuyoko strings are renered holizontally in vertical writing environment.
-It is just annotated with `"tcy"`{.haskell} class:
+It is just annotated with `"tcy"` class:
 
 ```haskell
 Para [Str "本日は第", Span ("", ["tcy"], []) [Str "42"], Str "回大会にご参加頂きありがとうございます"]
