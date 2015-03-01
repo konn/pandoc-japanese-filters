@@ -43,7 +43,6 @@ executable japanese-filter
                      , containers
                      , data-default
                      , pandoc
-                     , pandoc-japanese-docx
                      , pandoc-types
                      , text >= 1.1.0.0
                      , hxt
@@ -58,25 +57,7 @@ executable env-to-div-filter
                      , containers
                      , data-default
                      , pandoc
-                     , pandoc-japanese-docx
                      , pandoc-types
                      , text >= 1.1.0.0
                      , hxt
-  default-language:    Haskell2010
-
-executable pandoc-japanese
-  Main-is:             pandoc-japanese.hs
-  Other-modules:
-  build-depends:       base
-                     , bytestring
-                     , containers
-                     , data-default
-                     , directory
-                     , directory >= 1.2.1.0
-                     , filepath
-                     , pandoc
-                     , pandoc-japanese-docx
-                     , pandoc-types
-                     , text
-                     , text >= 1.1.0.0
   default-language:    Haskell2010
