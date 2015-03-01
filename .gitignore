@@ -1,0 +1,9 @@
+*~
+*.hi
+*.o
+dist
+TAGS
+.DS_Store
+.cabal-sandbox
+cabal.sandbox.config
+\#.*\#

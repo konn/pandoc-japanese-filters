@@ -1,0 +1,32 @@
+language: haskell
+ghc: 7.8
+before_install:
+- cabal install --only-dependencies -j2
+script:
+- cabal configure --enable-tests --enable-benchmarks -v2
+- cabal build -j
+- cabal test
+- cabal check
+- cabal sdist
+- export SRC_TGZ=$(cabal info . | awk '{print $2 ".tar.gz";exit}') ; cd dist/; if
+  [ -f "$SRC_TGZ" ]; then cabal install -j2 "$SRC_TGZ"; else echo "expected '$SRC_TGZ'
+  not found"; exit 1; fi; cd ../
+deploy:
+  provider: hackage
+  username: HiromiIshii
+  password:
+    # You have to add deploy package by:
+    # $ travis encrypt --add deploy.password
+  on:
+    all_branches: true
+    tags: true
+after_deploy:
+- sh ./upload-haddock.sh
+env:
+  global:
+  - HACKAGE_USER: HiromiIshii
+  # You have to add encrypted hackage password with HACKAGE_PASS by:
+  # 
+  # $ travis encrypt --add -i
+  # HACKAGE_PASS=(Your password here)
+  #
