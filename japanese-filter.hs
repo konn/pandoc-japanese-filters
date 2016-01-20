@@ -1,5 +1,7 @@
 {-# LANGUAGE OverloadedStrings, PatternGuards, QuasiQuotes, ViewPatterns #-}
 module Main where
+import PandocCompat (readLaTeX, readLaTeX')
+
 import           Control.Arrow          ((>>>))
 import           Data.Default
 import           Data.List              (intercalate)
@@ -8,11 +10,9 @@ import qualified Data.Text              as T
 import           Text.LaTeX             (LaTeX, render)
 import           Text.LaTeX.Base.Parser (parseLaTeX)
 import           Text.LaTeX.QQ          (hat')
-import           Text.Pandoc            (readLaTeX, writeHtmlString, writeICML)
+import           Text.Pandoc            (writeHtmlString, writeICML)
 import           Text.Pandoc            (writeLaTeX)
-import           Text.Pandoc.Builder    (fromList)
-import           Text.Pandoc.Builder    (doc)
-import           Text.Pandoc.Builder    (Inlines, plain)
+import           Text.Pandoc.Builder    (Inlines, doc, fromList, plain)
 import           Text.Pandoc.Definition (Format, Inline (RawInline, Span))
 import           Text.Pandoc.Definition (Block (..), Inline (..), Pandoc (..))
 import           Text.Pandoc.JSON       (toJSONFilter)
@@ -121,7 +121,7 @@ inlify (Pandoc _ bs0) = concatMap go bs0
     go Null = []
 
 latToInl :: LaTeX -> [Inline]
-latToInl = inlify . readLaTeX myReaderOpts . T.unpack . render
+latToInl = inlify . readLaTeX' myReaderOpts . T.unpack . render
 
 procJapanese :: Maybe Format -> Inline -> Inline
 procJapanese mfmt (Span (_, ["ruby"], atts) [rt, base])
@@ -146,13 +146,13 @@ procJapanese mfmt (Span (_, ["bullet"], _) is)
   = renderJapanese mfmt $ Kenten Dot is
 procJapanese mfmt (RawInline "latex" src)
   | Right [hat'|\bou{\hask{rt}}|] <- parseLaTeX (T.pack src)
-  = let toI = inlify . readLaTeX myReaderOpts . T.unpack . render
+  = let toI = inlify . readLaTeX' myReaderOpts . T.unpack . render
     in renderJapanese mfmt $ Kenten Sesame $ toI rt
 procJapanese mfmt (Span (_, ["tcy"], _) is)
   = renderJapanese mfmt $ TatechuYoko is
 procJapanese mfmt (RawInline "latex" src)
   | Right [hat'|\rensuji{\hask{rt}}|] <- parseLaTeX (T.pack src)
-  = let toI = inlify . readLaTeX myReaderOpts . T.unpack . render
+  = let toI = inlify . readLaTeX' myReaderOpts . T.unpack . render
     in renderJapanese mfmt $ TatechuYoko $ toI rt
 procJapanese _ i = i
 
@@ -160,7 +160,6 @@ myReaderOpts :: ReaderOptions
 myReaderOpts = def { readerParseRaw = True
                    , readerApplyMacros = False
                    }
-
 
 type Attrs = [(String, String)]
 

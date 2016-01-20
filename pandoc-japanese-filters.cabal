@@ -19,9 +19,24 @@ source-repository head
   type: git
   location: git://github.com/konn/pandoc-japanese-filters.git
 
+executable tate-math-to-svg-filter
+  Main-is:             tate-math-to-svg-filter.hs
+  Other-modules:       PandocCompat
+  build-depends:       base             >= 4 && < 5
+                     , system-filepath
+                     , system-fileio
+                     , pandoc
+                     , pandoc-types
+                     , HaTeX
+                     , HaTeX-qq
+                     , text
+                     , shelly
+                     , effin
+  default-language:    Haskell2010
+
 executable math-to-svg-filter
   Main-is:             math-to-svg-filter.hs
-  Other-modules:
+  Other-modules:       PandocCompat
   build-depends:       base             >= 4 && < 5
                      , system-filepath
                      , system-fileio
@@ -36,28 +51,28 @@ executable math-to-svg-filter
 
 executable japanese-filter
   Main-is:             japanese-filter.hs
-  Other-modules:
+  Other-modules:       PandocCompat
   build-depends:       HaTeX
-                     , HaTeX-qq >= 0.0.1.1 && < 0.1
+                     , HaTeX-qq
                      , base
                      , containers
                      , data-default
                      , pandoc
                      , pandoc-types
-                     , text >= 1.1.0.0
+                     , text
                      , hxt
   default-language:    Haskell2010
 
 executable env-to-div-filter
   Main-is:             env-to-div-filter.hs
-  Other-modules:
+  Other-modules:       PandocCompat
   build-depends:       HaTeX
-                     , HaTeX-qq >= 0.0.1.1 && < 0.1
+                     , HaTeX-qq
                      , base
                      , containers
                      , data-default
                      , pandoc
                      , pandoc-types
-                     , text >= 1.1.0.0
+                     , text
                      , hxt
   default-language:    Haskell2010

@@ -5,7 +5,6 @@
 module Main where
 
 import           Control.Applicative       ((<*))
-import           Control.Applicative       ((<$>))
 import           Control.Effect            (EffectState, evalState, get, modify)
 import           Control.Effect            (runEffect, runWriter, tell)
 import           Control.Monad             (forM_)
@@ -18,10 +17,8 @@ import           Shelly                    (pwd, shelly, withTmpDir, writefile)
 import           Shelly                    ((<.>), (</>))
 import           Shelly                    (cmd)
 import           Shelly                    (silently)
-import           Shelly                    (liftIO)
 import           Text.LaTeX                (document, documentclass)
 import           Text.LaTeX                (execLaTeXM, render, usepackage)
-import           Text.LaTeX                (execLaTeXT)
 import           Text.LaTeX.Base.Class     (fromLaTeX)
 import           Text.LaTeX.Base.Parser    (parseLaTeX)
 import           Text.LaTeX.Base.Syntax    (LaTeX (..))
@@ -34,7 +31,7 @@ import           Text.Pandoc               (Pandoc (..), bottomUpM)
 import           Text.Pandoc               (Block (..))
 import           Text.Pandoc.JSON          (toJSONFilter)
 
-default (T.Text, Double)
+default (T.Text)
 
 main :: IO ()
 main = toJSONFilter processMath
@@ -50,6 +47,7 @@ splitDisplayMath = undefined
 
 data MathSetting = MathSetting
                    { mathMode :: MathType
+                   , mathYoko :: Bool
                    , mathBody :: String
                    } deriving (Read, Show, Eq, Ord)
 
@@ -66,7 +64,7 @@ mathToTag mode n src =
       offset = b2i (labeled || indented) + b2i (mode == DisplayMath)
       linum = T.count "\\\\" (T.pack src) + 1 + offset
   in Span ("", [show mode], [])
-     [RawInline "html" $ "<img src=\""++ toSVGName n ++ "\" style=\"height:"++show linum ++"em\" />"]
+     [RawInline "html" $ "<img src=\""++ toSVGName n ++ "\" style=\"width:"++show linum ++"em\" />"]
 
 data Math = Equation LaTeX
           | FitchProof LaTeX
@@ -80,18 +78,18 @@ processMath pan = do
           | Right [hat'|\pboxy{\hask{lat}}|] <- parseLaTeX $ T.pack src
           , [hat'|$\hask{math}$|] <- stripTeX lat -> do
             n <- newIdent
-            tell [(n, MathSetting InlineMath $ T.unpack $ render math)]
+            tell [(n, MathSetting InlineMath True $ T.unpack $ render math)]
             return $ mathToTag InlineMath n src
         Math mode math -> do
             n <- newIdent
-            tell [(n, MathSetting mode math)]
+            tell [(n, MathSetting mode False math)]
             return $ mathToTag mode n math
         i -> return i
   shelly $ do
     cwd <- pwd
     let dist = cwd </> "maths"
     mkdir_p dist
-    src <- render <$> (execLaTeXT $ do
+    let src = render $ execLaTeXM $ do
           documentclass ["leqno"] "bxjsarticle"
           usepackage ["active", "xetex", "tightpage"] "preview"
           usepackage [] "mymacros"
@@ -105,8 +103,7 @@ processMath pan = do
           usepackage [] "fitch"
           usepackage [] "picins"
           fromLaTeX [hat|\def\fCenter{\ \vdash\ }|]
-          document $ forM_ maths $ \(_, MathSetting mode cont) -> do
-            liftIO $ print cont
+          document $ forM_ maths $ \(_, MathSetting mode yoko cont) -> do
             let Right lat = parseLaTeX $ T.pack cont
                 labeled = not (null $ matchCommand (`elem` ["tag", "label"]) lat)
                 math | mode == InlineMath = [hat|$\hask{lat}$|]
@@ -115,7 +112,9 @@ processMath pan = do
                      | labeled = TeXEnv "minipage" [FixArg [hat|25 \jsZw|]] $ TeXEnv "align" [] lat
                      | labeled = TeXEnv "minipage" [FixArg [hat|25 \jsZw|]] $ TeXEnv "align*" [] lat
                      | otherwise = TeXEnv "minipage" [FixArg [hat|25 \jsZw|]] $ [hat|\[ \hask{lat} \]|]
-            fromLaTeX $ TeXEnv "preview" [] math)
+                rot t | yoko = t
+                      | otherwise = TeXComm "rotatebox" [FixArg "-90", FixArg t]
+            fromLaTeX $ TeXEnv "preview" [] $ rot math
     let tmp = cwd </> "tmp"
     mkdir_p tmp
     withTmpDir $ \_tmp -> do
